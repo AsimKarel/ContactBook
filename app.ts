@@ -4,11 +4,13 @@ import express = require('express');
 const app: express.Application = express();
 const controller = require('./Controller/Controller')
 const bodyParser = require('body-parser');
+require('dotenv').config()
 
 app.use(bodyParser.urlencoded());
 app.use(bodyParser.json());
+
 app.use('/', controller)
 
-app.listen(3000, function () {
+app.listen(process.env.PORT, function () {
   console.log('Example app listening on port 3000!');
 });
