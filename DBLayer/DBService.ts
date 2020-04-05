@@ -8,11 +8,11 @@ const mysql = require('mysql');
 export class DatabaseService {
 
     dbConfig = {
-        host: "bupmqtonwvl4hxqgf1ws-mysql.services.clever-cloud.com",
-        user: "uamg8fiyaqmjxpg7",
-        password: "oDd1ijsy8F8xDa4x46cl",
-        database: "bupmqtonwvl4hxqgf1ws",
-        port:3306,
+        host: process.env.DB_HOST,
+        user: process.env.DB_USER,
+        password: process.env.DB_PASS,
+        database: process.env.DB_NAME,
+        port:process.env.DB_PORT,
     };
     connection = mysql.createConnection(this.dbConfig);
 

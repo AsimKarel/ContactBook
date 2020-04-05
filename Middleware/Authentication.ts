@@ -1,7 +1,7 @@
 export const auth = async(req:any, res:any, next:any) =>{
     const token = req.header('Token')
     console.log('>>>>>',req.header('Token'))
-    if(token == 'PlivoTestAsim'){
+    if(token == process.env.ACCESS_TOKEN){
         next()
     }
     else{
