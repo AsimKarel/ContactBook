@@ -2,6 +2,7 @@ import express = require('express');
 import { DatabaseService } from '../DBLayer/DBService';
 import { Contact } from '../Models/Contact';
 import { RequestModel } from '../Models/Request';
+import auth from '../Middleware/Authentication'
 var router = express.Router()
 
 
@@ -11,7 +12,53 @@ router.use(function timeLog(req, res, next) {
     next()
 })
 
-router.post('/getContacts', function (req, res) {
+
+router.get('/', function (req, res) {
+    const response = 
+    `
+    WELCOME TO CONTACTS API DOCUMENTATION
+        1. Paginated Contact List:
+            URL: /getContacts
+            Method: POST
+            BODY: {
+                "take": number,
+                "skip": number,
+                "searchQuery": "",
+                "sortBy": "name",
+                "sortOrder": "ASC"
+                }
+        
+        2.  Paginated Contact List:
+            URL: /save
+            Method: POST
+            BODY: {
+                "name": "",
+                "phone": "",
+                "email": "",
+                "country_code": "",
+                }
+
+        3.  Update Contact:
+            URL: /update
+            Method: PUT
+            BODY: {
+                "id: number,
+                "name": "",
+                "phone": "",
+                "email": "",
+                "country_code": "",
+                }    
+            
+        3.  Delete Contact:
+            URL: /delete/id
+            Method: DELETE
+    
+    `
+
+    res.send(response)
+});
+
+router.post('/getContacts', auth, async function (req, res) {
     const d = new DatabaseService();
     console.log(req.body)
     const conditions = req.body as RequestModel;
@@ -25,7 +72,7 @@ router.post('/getContacts', function (req, res) {
 
 });
 
-router.post('/save', function (req, res) {
+router.post('/save', auth, async function (req, res) {
     const d = new DatabaseService();
     d.saveContact(req.body).then((x) => {
         res.send(x);
@@ -53,7 +100,7 @@ router.post('/save', function (req, res) {
         })
 });
 
-router.put('/update', function (req, res) {
+router.put('/update', auth, async function (req, res) {
     const d = new DatabaseService();
     console.log(req.body)
     d.updateContact(req.body).then((x) => {
@@ -82,7 +129,7 @@ router.put('/update', function (req, res) {
         })
 });
 
-router.delete('/delete/:id', function (req, res) {
+router.delete('/delete/:id', auth, async function (req, res) {
     const d = new DatabaseService();
     console.log(req.params.id)
     d.deleteContact(parseInt(req.params.id)).then((x) => {

@@ -1,37 +1,47 @@
 import { promises } from "dns";
 import { Contact } from "../Models/Contact";
 import { RequestModel } from "../Models/Request";
+import { connect } from "http2";
 
 const mysql = require('mysql');
 
 export class DatabaseService {
 
-    connection = mysql.createConnection({
-        
-    });
+    dbConfig = {
+        host: "bupmqtonwvl4hxqgf1ws-mysql.services.clever-cloud.com",
+        user: "uamg8fiyaqmjxpg7",
+        password: "oDd1ijsy8F8xDa4x46cl",
+        database: "bupmqtonwvl4hxqgf1ws",
+        port:3306,
+    };
+    connection = mysql.createConnection(this.dbConfig);
 
     constructor() {
-
+        setInterval(() => {
+            this.connection.query('SELECT 1');
+        }, 5000);
+        // mysql://uamg8fiyaqmjxpg7:oDd1ijsy8F8xDa4x46cl@bupmqtonwvl4hxqgf1ws-mysql.services.clever-cloud.com:3306/bupmqtonwvl4hxqgf1ws
     }
 
     getContacts = (request: RequestModel) => {
         return new Promise((resolve, reject) => {
-            this.connection.connect((err: Error) => {
-                if (err) {
-                    throw err;
-                    reject(err);
+            this.connection.connect((connectionError: Error) => {
+                if (connectionError) {
+                    console.log(connectionError)
+                    // reject(connectionError);
+                    this.handleDisconnect();
                 }
                 console.log("Connected!");
                 this.connection
-                    .query("SELECT * FROM Contacts where name like CONCAT('%', ?,  '%') or email like CONCAT('%', ?,  '%') ORDER BY ? ? LIMIT ? OFFSET ?",
-                        [[request.searchQuery], [request.searchQuery], [request.sortBy], [request.sortOrder], [request.take], [request.skip]],
+                    .query("SELECT * FROM Contacts where name like CONCAT('%', ?,  '%') or email like CONCAT('%', ?,  '%') ORDER BY "+request.sortBy+" "+request.sortOrder+" LIMIT ? OFFSET ?",
+                        [[request.searchQuery], [request.searchQuery], [request.take], [request.skip]],
                         (er: Error, res: [Contact]) => {
                             if (er) {
-                                this.connection.end();
+                                
                                 reject(er);
                             }
                             else {
-                                this.connection.end();
+                                
                                 resolve(res);
                             }
                         })
@@ -41,22 +51,22 @@ export class DatabaseService {
 
     saveContact = (contact: Contact) => {
         return new Promise((resolve, reject) => {
-            this.connection.connect((err: Error) => {
-                if (err) {
-                    throw err;
-                    reject(err);
+            this.connection.connect((connectionError: Error) => {
+                if (connectionError) {
+                    // reject(connectionError);
+                    this.handleDisconnect();
                 }
                 console.log("Connected!");
                 this.connection
                     .query("INSERT INTO Contacts(name, phone, email, country_code) values (?)",
                         [[contact.name, contact.phone, contact.email, contact.country_code]], (er: Error, res: [Contact]) => {
                             if (er) {
-                                this.connection.end();
+                                
                                 reject(er);
                             }
                             else {
                                 console.log(res);
-                                this.connection.end();
+                                
                                 resolve(res);
                             }
                         })
@@ -66,10 +76,10 @@ export class DatabaseService {
 
     updateContact = (contact: Contact) => {
         return new Promise((resolve, reject) => {
-            this.connection.connect((err: Error) => {
-                if (err) {
-                    throw err;
-                    reject(err);
+            this.connection.connect((connectionError: Error) => {
+                if (connectionError) {
+                    // reject(connectionError);
+                    this.handleDisconnect();
                 }
                 console.log(contact);
                 this.connection
@@ -81,7 +91,7 @@ export class DatabaseService {
                             }
                             else {
                                 console.log(res);
-                                this.connection.end();
+                                
                                 resolve(res);
                             }
                         })
@@ -91,24 +101,38 @@ export class DatabaseService {
 
     deleteContact = (id: number) => {
         return new Promise((resolve, reject) => {
-            this.connection.connect((err: Error) => {
-                if (err) {
-                    throw err;
-                    reject(err);
+            this.connection.connect((connectionError: Error) => {
+                if (connectionError) {
+                    // reject(connectionError);
+                    this.handleDisconnect();
                 }
                 console.log("Connected!");
                 this.connection.query("DELETE FROM Contacts WHERE ID=?", [[id]], (er: Error, res: [Contact]) => {
                     if (er) {
-                        this.connection.end();
+                        
                         reject(er);
                     }
                     else {
-                        this.connection.end();
+                        
                         resolve(res);
                     }
                 })
             });
         })
     }
+
+
+    handleDisconnect() {
+        try{
+            console.log('error coooo')
+            this.connection = mysql.createConnection(this.dbConfig);
+        }
+        catch{
+            this.handleDisconnect()
+        }
+        
+        
+    }
+      
 }
 
