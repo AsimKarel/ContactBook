@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "engines": {
+    "node":"12.10.0"
+  },
   "scripts": {
     "start": "tsc && node ./build/app.js",
     "test": "test",
