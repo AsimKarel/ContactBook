@@ -1,4 +1,4 @@
-const auth = async(req, res, next) =>{
+export const auth = async(req:any, res:any, next:any) =>{
     const token = req.header('Token')
     console.log('>>>>>',req.header('Token'))
     if(token == 'PlivoTestAsim'){
@@ -8,4 +8,3 @@ const auth = async(req, res, next) =>{
         res.status(401).send({ error: 'Not authorized to access this resource' })
     }
 }
-module.exports = auth

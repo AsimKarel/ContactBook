@@ -2,7 +2,7 @@ import express = require('express');
 import { DatabaseService } from '../DBLayer/DBService';
 import { Contact } from '../Models/Contact';
 import { RequestModel } from '../Models/Request';
-import auth from '../Middleware/Authentication'
+import {auth} from '../Middleware/Authentication'
 var router = express.Router()
 
 
